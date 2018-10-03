@@ -1,2 +1,2 @@
-# sgi
+# SGI
 Some webGL stuff here
