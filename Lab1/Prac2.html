@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+
+
+
+
+<html>
+	<body>
+	
+   <canvas id="myCanvas" style="border: 10px solid #c3c3c3;" width="578" height="200"></canvas>
+    
+
+	<script>
+      
+
+      
+      
+		function writeMessage(canvas, message) 
+		{
+            var context = canvas.getContext('2d');
+        
+			context.clearRect(0, 0, canvas.width, canvas.height);
+        
+			context.font = '18pt Calibri';
+        
+			context.fillStyle = 'black';
+        
+			context.fillText(message, 10, 25);
+      
+		}
+
+      
+		function getMousePos(canvas, evt) 
+		{
+            var rect = canvas.getBoundingClientRect();
+        
+			return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+
+		}
+      
+		
+		var canvas = document.getElementById('myCanvas');
+      
+		var context = canvas.getContext('2d');
+
+        var coordenadesInicials;
+        var coordenadesFinals;
+		
+      
+        canvas.addEventListener('mousedown',function(e){
+            
+            coordenadesInicials = getMousePos(canvas,e);
+        });
+      
+      
+        canvas.addEventListener('mouseup',function(e){
+            
+            coordenadesFinals = getMousePos(canvas,e);
+            
+            var context = canvas.getContext('2d');
+            
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            context.fillStyle = "#FF0000";
+            context.fillRect(coordenadesInicials.x,coordenadesInicials.y,(coordenadesFinals.x - coordenadesInicials.x),(coordenadesFinals.y - coordenadesInicials.y));
+            
+            //var message = 'PosicioInicial: ' + coordenadesInicials.x + ',' + coordenadesInicials.y + '  -- //PosicioFinal: '  + (coordenadesFinals.x - coordenadesInicials.x) + ',' + (coordenadesInicials.y - coordenadesFinals.y);
+            
+            //writeMessage(canvas, message);
+            
+            coordenadesInicials = null;
+            coordenadesFinals = null;
+        });
+    
+    
+	</script>
+  
+
+		
+	</body>
+</html>
