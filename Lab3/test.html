@@ -43,6 +43,7 @@
 <script type="text/javascript">
 
     var gl;
+    var radiEsc = Math.sqrt(3);
 
     function initGL(canvas) {
         try {
@@ -298,18 +299,27 @@
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
-
+        // mat4.xRotate(mvMatrix, -angleY);
+        // mat4.yRotate(mvMatrix, -angleX);
+        
+        //m4.translate(mvMatrix,[0,0,3]);
+        
+        //mat4.yRotation(mvMatrix,-angleY);
+        //mat4.rotate(pMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
+        mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
+        mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
+        
         mat4.identity(mvMatrix);
-
-        mat4.translate(mvMatrix, [-1.5, 0.0, -8.0]);
-
+        
         mvPushMatrix();
         
-        mat4.translate(mvMatrix, [horizontal,vertical, 0.0]);
+        mat4.translate(mvMatrix, [horizontal-1.5,vertical,-8.0]);
         mat4.scale(mvMatrix,[escala,escala,escala]);
-        mat4.rotate(mvMatrix, degToRad(rPyramid), [0, 1, 0]);
+        //mat4.rotate(mvMatrix, degToRad(rPyramid), [0, 1, 0]);
+        //mat4.rotate(mvMatrix, 0, [0, 1, 0]);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, pyramidVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -322,14 +332,15 @@
 
         mvPopMatrix();
 
-
-        mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
+        //mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
+        //mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
+        
 
         mvPushMatrix();
         
-        mat4.translate(mvMatrix, [horizontal,vertical, 0.0]);
+        mat4.translate(mvMatrix, [horizontal+1.5,vertical, -8.0]);
         mat4.scale(mvMatrix,[escala,escala,escala]);
-        mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
+        //mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -342,7 +353,6 @@
         gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
         mvPopMatrix();
-
     }
 
 
@@ -360,6 +370,43 @@
         else if (e.key == 'k') escala += 0.1;
         else if (e.key == 'l') escala -= 0.1;
     };
+    
+    
+    var xClick = 0;
+    var yClick = 0;
+    var angleX = 0;
+    var angleY = 0;
+    var DoingInteractive = 'NONE';
+    
+    document.onmousedown = function(e){
+    
+        xClick = e.x;
+        yClick = e.y;
+        
+        DoingInteractive = 'ROTATE'
+    }
+    
+    document.onmouseup = function(e){
+        DoingInteractive='NONE'
+    }
+
+    
+    document.onmousemove = function(e){
+     
+        if (DoingInteractive == 'ROTATE') {
+            
+            // Fem la rotació
+            angleY += (e.x - xClick) * Math.PI / 180.0; //rotació horitzontal
+            angleX += (e.y - yClick) * Math.PI / 180.0; //rotació vertical
+            //viewTransform ();
+        }
+
+        xClick = e.x;
+        yClick = e.y;
+        
+        drawScene();
+    }
+    
 
     function animate() {
         var timeNow = new Date().getTime();
@@ -372,13 +419,13 @@
         lastTime = timeNow;
     }
 
-
+/*
     function tick() {
         requestAnimFrame(tick);
         drawScene();
         animate();
     }
-
+*/
 
     function webGLStart() {
         var canvas = document.getElementById("lesson04-canvas");
