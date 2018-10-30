@@ -301,14 +301,6 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
-
-        // mat4.xRotate(mvMatrix, -angleY);
-        // mat4.yRotate(mvMatrix, -angleX);
-        
-        //m4.translate(mvMatrix,[0,0,3]);
-        
-        //mat4.yRotation(mvMatrix,-angleY);
-        //mat4.rotate(pMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
         
         mat4.identity(mvMatrix);
         
@@ -319,8 +311,7 @@
         
         mat4.translate(mvMatrix, [horizontal-1.5,vertical,-8.0]);
         mat4.scale(mvMatrix,[escala,escala,escala]);
-        //mat4.rotate(mvMatrix, degToRad(rPyramid), [0, 1, 0]);
-        //mat4.rotate(mvMatrix, 0, [0, 1, 0]);
+        mat4.rotate(mvMatrix, degToRad(rPyramid), [0, 1, 0]);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, pyramidVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -332,16 +323,13 @@
         gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems);
 
         mvPopMatrix();
-
-        //mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
-        //mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
         
 
         mvPushMatrix();
         
         mat4.translate(mvMatrix, [horizontal+1.5,vertical, -8.0]);
         mat4.scale(mvMatrix,[escala,escala,escala]);
-        //mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
+        mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
