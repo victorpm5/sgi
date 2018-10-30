@@ -309,10 +309,11 @@
         
         //mat4.yRotation(mvMatrix,-angleY);
         //mat4.rotate(pMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
-        mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
-        mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
         
         mat4.identity(mvMatrix);
+        
+        mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
+        mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
         
         mvPushMatrix();
         
@@ -419,13 +420,13 @@
         lastTime = timeNow;
     }
 
-/*
+
     function tick() {
         requestAnimFrame(tick);
         drawScene();
         animate();
     }
-*/
+
 
     function webGLStart() {
         var canvas = document.getElementById("lesson04-canvas");
