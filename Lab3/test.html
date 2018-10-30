@@ -300,7 +300,7 @@
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
+        mat4.perspective(45+zoom, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
         
         mat4.identity(mvMatrix);
         
@@ -349,6 +349,7 @@
     var vertical = 0;
     var horizontal = 0;
     var escala = 1;
+    var zoom = 0;
     
     document.onkeypress = function(e){
         
@@ -358,6 +359,13 @@
         else if (e.key == 'd') horizontal += 0.1;
         else if (e.key == 'k') escala += 0.1;
         else if (e.key == 'l') escala -= 0.1;
+        else if (e.key == '+') zoom -= 0.5;
+        else if (e.key == '-') zoom += 0.5;
+        
+        
+        if (zoom < -30) zoom = -30;
+        
+        
     };
     
     
@@ -395,6 +403,12 @@
         
         drawScene();
     }
+    
+    
+  /*  document.onwheel = function(e){
+        console.log(e);
+    }*/
+
     
 
     function animate() {
