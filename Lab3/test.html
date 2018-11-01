@@ -14,13 +14,13 @@
 
     void main(void) {
     
-         if ( mod(gl_FragCoord.x,10.) > 5.){
+       /*  if ( mod(gl_FragCoord.x,10.) > 5.){
            gl_FragColor = vColor;
          }else if (mod(gl_FragCoord.x,10.) < 2.5){
             discard;
          } 
-    
-        //gl_FragColor = vColor;
+    */
+        gl_FragColor = vColor;
     }
 </script>
 
@@ -158,6 +158,11 @@
     var cubeVertexIndexBuffer;
 
     function initBuffers() {
+
+    	/*
+    	*************** Inicialitzem buffer de la piràmide ************************
+    	*/
+
         pyramidVertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
         var vertices = [
@@ -212,6 +217,10 @@
         pyramidVertexColorBuffer.itemSize = 4;
         pyramidVertexColorBuffer.numItems = 12;
 
+
+        /*
+        ****************************Inicialitzem buffer del cub ****************************
+        */
 
         cubeVertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
@@ -296,18 +305,9 @@
     var rPyramid = 0;
     var rCube = 0;
 
-    function drawScene() {
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        
-        mat4.perspective(45+zoom, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
-        
-        mat4.identity(mvMatrix);
-        
-        mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
-        mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
-        
-        mvPushMatrix();
+    function dibuixaPiramide(){
+
+    	mvPushMatrix();
         
         mat4.translate(mvMatrix, [horizontal-1.5,vertical,-8.0]);
         mat4.scale(mvMatrix,[escala,escala,escala]);
@@ -323,9 +323,11 @@
         gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems);
 
         mvPopMatrix();
-        
+    }
 
-        mvPushMatrix();
+    function dibuixaCub(){
+
+    	mvPushMatrix();
         
         mat4.translate(mvMatrix, [horizontal+1.5,vertical, -8.0]);
         mat4.scale(mvMatrix,[escala,escala,escala]);
@@ -342,6 +344,30 @@
         gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
         mvPopMatrix();
+    }
+
+    function initView(){
+
+    	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+        mat4.perspective(45+zoom, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
+        
+        mat4.identity(mvMatrix);
+    }
+
+    function viewTransform(){
+        mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
+        mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
+    }
+
+    function drawScene() {
+
+    	initView();
+    	viewTransform();
+   
+        dibuixaPiramide();
+        dibuixaCub();
     }
 
 
@@ -362,10 +388,7 @@
         else if (e.key == '+') zoom -= 0.5;
         else if (e.key == '-') zoom += 0.5;
         
-        
         if (zoom < -30) zoom = -30;
-        
-        
     };
     
     
@@ -377,10 +400,13 @@
     
     document.onmousedown = function(e){
     
-        xClick = e.x;
-        yClick = e.y;
-        
-        DoingInteractive = 'ROTATE'
+    	if(e.target.id == 'canvasID'){
+
+	        xClick = e.x;
+	        yClick = e.y;
+	        
+	        DoingInteractive = 'ROTATE'
+    	}
     }
     
     document.onmouseup = function(e){
@@ -395,21 +421,17 @@
             // Fem la rotació
             angleY += (e.x - xClick) * Math.PI / 180.0; //rotació horitzontal
             angleX += (e.y - yClick) * Math.PI / 180.0; //rotació vertical
-            //viewTransform ();
         }
 
         xClick = e.x;
         yClick = e.y;
-        
-        drawScene();
+
     }
     
     
   /*  document.onwheel = function(e){
         console.log(e);
     }*/
-
-    
 
     function animate() {
         var timeNow = new Date().getTime();
@@ -431,7 +453,7 @@
 
 
     function webGLStart() {
-        var canvas = document.getElementById("lesson04-canvas");
+        var canvas = document.getElementById("canvasID");
         initGL(canvas);
         initShaders()
         initBuffers();
@@ -449,7 +471,7 @@
 
 
 <body onload="webGLStart();">
-    <canvas id="lesson04-canvas" style="border: none;" width="500" height="500"></canvas>
+    <canvas id="canvasID" style="border: none;" width="500" height="500"></canvas>
 </body>
 
 </html>
