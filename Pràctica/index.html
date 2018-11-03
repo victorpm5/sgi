@@ -349,17 +349,86 @@
     var piramideVertexNormalBuffer;
     var piramideTextureCoordBuffer;
 
+    var terraVertexPositionBuffer;
+    var terraVertexNormalBuffer;
+    var terraTextureCoordBuffer;
+    var terraVertexIndexBuffer;
+
     var cubeVertexPositionBuffer;
     var cubeVertexNormalBuffer;
     var cubeVertexTextureCoordBuffer;
     var cubeVertexIndexBuffer;
 
     var esferaVertexPositionBuffer;
-    var moonVertexNormalBuffer;
-    var moonVertexTextureCoordBuffer;
-    var moonVertexIndexBuffer;
+    var esferaVertexNormalBuffer;
+    var esferaVertexTextureCoordBuffer;
+    var esferaVertexIndexBuffer;
     
     function initBuffers() {
+
+        /**
+        *******************************************************************
+        *************** Buffers de la base ********************************
+        *******************************************************************/
+
+        terraVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, terraVertexPositionBuffer);
+
+        var vertices = [
+
+             10.0, 0.0, -10.0,
+             10.0, 0.0,  10.0,
+            -10.0, 0.0, -10.0,
+            -10.0, 0.0,  10.0
+
+        ];
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        terraVertexPositionBuffer.itemSize = 3;
+        terraVertexPositionBuffer.numItems = 4;
+
+
+        terraVertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, terraVertexNormalBuffer);
+       
+        var vertexNormals = [
+
+            -1.0,  1.0, -1.0,
+            -1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0, -1.0,
+        ];
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
+        terraVertexNormalBuffer.itemSize = 3;
+        terraVertexNormalBuffer.numItems = 4;
+
+
+        terraTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, terraTextureCoordBuffer);
+        var textureCoords = [
+            
+            // Top face
+            0.0, 1.0,
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+
+        ];
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+        terraTextureCoordBuffer.itemSize = 2;
+        terraTextureCoordBuffer.numItems = 4;
+
+        terraVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terraVertexIndexBuffer);
+        var terraVertexIndices = [
+            0, 1, 2,      1, 2, 3,    // Front face
+        ];
+
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(terraVertexIndices), gl.STATIC_DRAW);
+        terraVertexIndexBuffer.itemSize = 1;
+        terraVertexIndexBuffer.numItems = 6;
 
         /**
         *******************************************************************
@@ -659,17 +728,17 @@
             }
         }
 
-        moonVertexNormalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
+        esferaVertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, esferaVertexNormalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
-        moonVertexNormalBuffer.itemSize = 3;
-        moonVertexNormalBuffer.numItems = normalData.length / 3;
+        esferaVertexNormalBuffer.itemSize = 3;
+        esferaVertexNormalBuffer.numItems = normalData.length / 3;
 
-        moonVertexTextureCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
+        esferaVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, esferaVertexTextureCoordBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
-        moonVertexTextureCoordBuffer.itemSize = 2;
-        moonVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
+        esferaVertexTextureCoordBuffer.itemSize = 2;
+        esferaVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
 
         esferaVertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, esferaVertexPositionBuffer);
@@ -677,13 +746,42 @@
         esferaVertexPositionBuffer.itemSize = 3;
         esferaVertexPositionBuffer.numItems = vertexPositionData.length / 3;
 
-        moonVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
+        esferaVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, esferaVertexIndexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
-        moonVertexIndexBuffer.itemSize = 1;
-        moonVertexIndexBuffer.numItems = indexData.length;
+        esferaVertexIndexBuffer.itemSize = 1;
+        esferaVertexIndexBuffer.numItems = indexData.length;
     }
 
+
+    function dibuixaBase(){
+
+        mvPushMatrix();
+        
+        mat4.translate(mvMatrix, [0, -4, 0]);
+        
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, lavaTexture);
+        gl.uniform1i(currentProgram.samplerUniform, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, terraVertexPositionBuffer);
+        gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, terraVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, terraTextureCoordBuffer);
+        gl.vertexAttribPointer(currentProgram.textureCoordAttribute, terraTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, terraVertexNormalBuffer);
+        gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, terraVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terraVertexIndexBuffer);
+        setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLE_STRIP, terraVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+       // setMatrixUniforms();
+       // gl.drawArrays(gl.TRIANGLES, 0, terraVertexPositionBuffer.numItems);
+        
+        mvPopMatrix();
+    }
 
     function dibuixaPiramide(){
 
@@ -726,15 +824,15 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, esferaVertexPositionBuffer);
         gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, esferaVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
-        gl.vertexAttribPointer(currentProgram.textureCoordAttribute, moonVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, esferaVertexTextureCoordBuffer);
+        gl.vertexAttribPointer(currentProgram.textureCoordAttribute, esferaVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
-        gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, moonVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, esferaVertexNormalBuffer);
+        gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, esferaVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, esferaVertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, moonVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, esferaVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
         
         mvPopMatrix();
     }
@@ -785,8 +883,8 @@
 
         mat4.rotate(mvMatrix, degToRad(30), [1, 0, 0]);
 
-        //mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
-        //mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
+        mat4.rotate(mvMatrix, -angleY, [0, 1, 0]); //rotació horitzontal
+        mat4.rotate(mvMatrix, -angleX, [1, 0, 0]); //rotació vertical
     }
 
     var moonAngle = 180;
@@ -834,6 +932,7 @@
 
         viewTransform();
 
+        dibuixaBase();
         dibuixaPiramide();
         dibuixaEsfera();
         dibuixaCub();
