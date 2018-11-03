@@ -308,6 +308,17 @@
         }
         pedraTexture.image.src = "piedra.jpg";
 
+                /*
+        ********* Textura de ROCK ***********
+        */
+
+        rockTexture = gl.createTexture();
+        rockTexture.image = new Image();
+        rockTexture.image.onload = function () {
+            handleLoadedTexture(rockTexture)
+        }
+        rockTexture.image.src = "rock.jpg";
+
     }
 
 
@@ -904,7 +915,7 @@
         gl.vertexAttribPointer(currentProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, earthTexture);
+        gl.bindTexture(gl.TEXTURE_2D, rockTexture);
         gl.uniform1i(currentProgram.samplerUniform, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
