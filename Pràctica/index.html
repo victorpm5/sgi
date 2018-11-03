@@ -831,12 +831,12 @@
         mvPopMatrix();
     }
 
-    function dibuixaPiramide(){
+    function dibuixaPiramide(inversa){
 
         mvPushMatrix();
         
         mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
-        mat4.translate(mvMatrix, [6, 0, 0]);
+        mat4.translate(mvMatrix, [6*inversa, 0, 0]);
         
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, pedraTexture);
@@ -918,10 +918,9 @@
 
         mvPushMatrix();
         
-        
-        mat4.scale(mvMatrix,[-0.85 + escala,-0.85 + escala,-0.85 + escala]);
         mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
-        mat4.translate(mvMatrix, [65, 0, 0]);
+        mat4.translate(mvMatrix, [-3, 0, 0]);
+        mat4.scale(mvMatrix,[-0.08 + (escala*0.2),-0.08 + (escala*0.2),-0.08 + (escala*0.2)]);
         
 
         gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexPositionBuffer);
@@ -1011,10 +1010,11 @@
         viewTransform();
 
         dibuixaBase();
-        dibuixaPiramide();
+        dibuixaPiramide(1);
         dibuixaEsfera();
         dibuixaCub();
         dibuixaTeapot();
+        dibuixaPiramide(-1);
 
     }
 
