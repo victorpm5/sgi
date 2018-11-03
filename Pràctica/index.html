@@ -306,7 +306,7 @@
         pedraTexture.image.onload = function () {
             handleLoadedTexture(pedraTexture)
         }
-        pedraTexture.image.src = "piedra.png";
+        pedraTexture.image.src = "piedra.jpg";
 
     }
 
@@ -761,7 +761,7 @@
         mat4.translate(mvMatrix, [0, -4, 0]);
         
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, lavaTexture);
+        gl.bindTexture(gl.TEXTURE_2D, fustaTexture);
         gl.uniform1i(currentProgram.samplerUniform, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, terraVertexPositionBuffer);
@@ -791,7 +791,7 @@
         mat4.translate(mvMatrix, [6, 0, 0]);
         
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, lavaTexture);
+        gl.bindTexture(gl.TEXTURE_2D, pedraTexture);
         gl.uniform1i(currentProgram.samplerUniform, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, piramideVertexPositionBuffer);
@@ -813,7 +813,7 @@
 
         mvPushMatrix();
         
-        mat4.translate(mvMatrix, [0, 0, 0]);
+        mat4.translate(mvMatrix, [0+horizontal, 0+vertical, 0]);
         mat4.scale(mvMatrix,[escala,escala,escala]);
         mat4.rotate(mvMatrix, degToRad(moonAngle), [0, 1, 0]);
         
@@ -856,7 +856,7 @@
         gl.vertexAttribPointer(currentProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, lavaTexture);
+        gl.bindTexture(gl.TEXTURE_2D, earthTexture);
         gl.uniform1i(currentProgram.samplerUniform, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
@@ -879,7 +879,7 @@
 
         mat4.identity(mvMatrix);
 
-        mat4.translate(mvMatrix, [0, 0, -15 + zoom]);
+        mat4.translate(mvMatrix, [0, 0, -20 + zoom]);
 
         mat4.rotate(mvMatrix, degToRad(30), [1, 0, 0]);
 
