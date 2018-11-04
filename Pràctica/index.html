@@ -11,6 +11,47 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+<style>
+.slidecontainer {
+    width: 20%;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 20%;
+    height: 10px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+</style>
+
+
 <script id="per-vertex-lighting-fs" type="x-shader/x-fragment">
     precision mediump float;
 
@@ -21,17 +62,19 @@
 
     uniform sampler2D uSampler;
 
+    uniform bool uPintaFranjes;
+
     void main(void) {
         vec4 fragmentColor;
         if (uUseTextures) {
             fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
         } else {
             
-            if ( mod(gl_FragCoord.x,10.) > 5.){
+            /*if ( mod(gl_FragCoord.x,10.) > 5.){
                 discard;
-            }
+            }*/
 
-            fragmentColor = vec4(0.0, 1.0, 0.0, 1.0);
+            fragmentColor = vec4(1.0, 1.0, 1.0, 1.0);
         }
         gl_FragColor = vec4(fragmentColor.rgb * vLightWeighting, fragmentColor.a);
     }
@@ -52,6 +95,8 @@
     uniform vec3 uPointLightingColor;
 
     uniform bool uUseLighting;
+
+    uniform bool uPintaColor;
 
     varying vec2 vTextureCoord;
     varying vec3 vLightWeighting;
@@ -83,6 +128,7 @@
 
     uniform bool uUseLighting;
     uniform bool uUseTextures;
+    uniform bool uPintaFranjes;
 
     uniform vec3 uAmbientColor;
 
@@ -121,6 +167,8 @@
     uniform mat4 uMVMatrix;
     uniform mat4 uPMatrix;
     uniform mat3 uNMatrix;
+
+    uniform bool uPintaColor;
 
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
@@ -216,6 +264,8 @@
 
         program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures");
         program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
+        program.pintaColorUniform = gl.getUniformLocation(program, "uPintaColor");
+        program.pintaFranjesUniform = gl.getUniformLocation(program, "uPintaFranjes");
         
         program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
         
@@ -1053,6 +1103,12 @@
         var textures = document.getElementById("textures").checked;
         gl.uniform1i(currentProgram.useTexturesUniform, textures);
 
+        var pintaColor = document.getElementById("pintarColor").checked;
+        gl.uniform1i(currentProgram.pintaColorUniform, pintaColor);
+
+        var pintaFranja = document.getElementById("pintarFranjes").checked;
+        gl.uniform1i(currentProgram.pintaFranjesUniform, pintaFranja)
+
         viewTransform();
 
         dibuixaBase();
@@ -1219,6 +1275,8 @@
         terraDragTex = 'fustaTex';
         ambientLight = hex2rgb('#333333');
         directionalLight = hex2rgb('#aaaaaa');
+        sceneColor = hex2rgb('#00aa00');
+        tamanyFranjes = 50;
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -1266,6 +1324,17 @@
     var directionalLight;
     function setDirectionalLight(color){
         directionalLight = hex2rgb(color);
+    }
+
+    var sceneColor;
+    function setSceneColor(color){
+        sceneColor = hex2rgb(color);
+    }
+
+    var tamanyFranjes;
+    function setFranjes(tamany){
+        tamanyFranjes = tamany;
+        $('#valorFranjes').text(tamany);
     }
 
 </script>
@@ -1323,7 +1392,7 @@
                         
                         <p>L'escena inicial consta d'una esfera i 4 figures que giren al seu voltant. Si vols, pots aplicar transformacions geomètriques sobre l'escena. Escull una figura a continuació (<b>les piramides van juntes i actuen com un mirall</b>) i utilitza les lletres del teclat <b>A,W,S,D</b> per moure't en els eixos X i Y. També pots utilitzar les tecles <b>K i L</b> per aplicar escalats.</p>
 
-                        <p> Nota: Quan apliquis transformacions geomètriques, les figures deixaran de girar entorn de l'esfera per girar sobre si mateixes. </p>
+                        <p> <b>Nota: Quan apliquis transformacions geomètriques, les figures deixaran de girar entorn de l'esfera per girar sobre si mateixes.</b></p>
 
                         Quina figura vols modificar?
                             <select id='figuraTransforma'>
@@ -1392,6 +1461,37 @@
                 Y: <input type="number" id="lightPositionY" value="5.0" />
                 Z: <input type="number" id="lightPositionZ" value="0.0" />
         </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h4>Color</h4>
+        </div>
+        <div class="panel-body">
+            <p>Vols aplicar color a l'escena? L'opció per defecte <b>"No pintar"</b> mostra l'escena en blanc amb textures per sobre. L'opció <b>"Pintar color"</b> permet pintar l'escena del color especificat variant la intensitat en l'eix Y. L'opció <b>"Pintar franjes"</b> pinta l'escena per franjes del color i tamany especificat.</p>
+
+            <p><b>Nota: Les opcions "pintar color" o "pintar franjes" tenen prioritat sobre l'ús de textures.</b></p>
+           
+            <div class="form-group">
+                <label class="radio-inline">
+                    <input id="noPintar" type="radio" name="optradio" checked>No pintar
+                </label>
+                <label class="radio-inline">
+                    <input id="pintarColor" type="radio" name="optradio">Pintar color
+                </label>
+                <label class="radio-inline">
+                    <input id="pintarFranjes" type="radio" name="optradio">Pintar franjes
+                </label>
+            </div>
+
+            <b>Color de l'escena:</b> <input type="color" id="colorEscena" value="#00aa00" onchange="setSceneColor(this.value);"></br>
+            </br>
+            <div class="slidecontainer">
+                <b>Tamany franjes:</b></br>
+                </br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="tamanyFranjes" onchange="setFranjes(this.value);">
+                Valor: <span id="valorFranjes">50</span></p>
+            </div>
     </div>
 </div>
 </body>
