@@ -213,9 +213,12 @@
         program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
         program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
         program.samplerUniform = gl.getUniformLocation(program, "uSampler");
+
         program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures");
         program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
+        
         program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
+        
         program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
         program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
 
@@ -241,6 +244,8 @@
 
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
+
+
     var moonTexture;
     var earthTexture;
     var fustaTexture;
@@ -1008,6 +1013,10 @@
         
         initView();
 
+
+        /**
+        *******************Il·luminació a nivell de vertex o de fragment ************
+        */
         var perFragmentLighting = document.getElementById("per-fragment").checked;
         if (perFragmentLighting) {
             currentProgram = perFragmentProgram;
@@ -1021,9 +1030,9 @@
         if (lighting) {
             gl.uniform3f(
                 currentProgram.ambientColorUniform,
-                parseFloat(document.getElementById("ambientR").value),
-                parseFloat(document.getElementById("ambientG").value),
-                parseFloat(document.getElementById("ambientB").value)
+                parseFloat((ambientLight[0]/255.0)),
+                parseFloat((ambientLight[1]/255.0)),
+                parseFloat((ambientLight[2]/255.0))
             );
 
             gl.uniform3f(
@@ -1035,9 +1044,9 @@
 
             gl.uniform3f(
                 currentProgram.pointLightingColorUniform,
-                parseFloat(document.getElementById("pointR").value),
-                parseFloat(document.getElementById("pointG").value),
-                parseFloat(document.getElementById("pointB").value)
+                parseFloat((directionalLight[0]/255.0)),
+                parseFloat((directionalLight[1]/255.0)),
+                parseFloat((directionalLight[2]/255.0))
             );
         }
 
@@ -1208,6 +1217,8 @@
 
         tipusCamaraView = 'Perspectiva';
         terraDragTex = 'fustaTex';
+        ambientLight = hex2rgb('#333333');
+        directionalLight = hex2rgb('#aaaaaa');
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -1242,6 +1253,20 @@
         terraDragTex = id;
     }
 
+
+    function hex2rgb(hex) {
+      return ['0x' + hex[1] + hex[2] | 0, '0x' + hex[3] + hex[4] | 0, '0x' + hex[5] + hex[6] | 0];
+    }
+
+    var ambientLight;
+    function setAmbientLight(color){
+        ambientLight = hex2rgb(color);
+    }
+
+    var directionalLight;
+    function setDirectionalLight(color){
+        directionalLight = hex2rgb(color);
+    }
 
 </script>
 
@@ -1350,45 +1375,25 @@
             <h4>Il·luminació</h4>
         </div>
         <div class="panel-body">
-            <p> - Selecciona el tipus de càmara en la banda superior esquerra de l'escena</p>
-            <p> - Aplica zoom sobre l'escena mitjançant els botons del teclat '+' i '-' </p>
-            <p> - Mou la càmara de l'escena interactuant amb el ratolí </p>
+
+            <input type="checkbox" id="lighting" checked /> Vols aplicar il·luminació? <br/>
+            <input type="checkbox" id="per-fragment" checked /> Vols fer el càlcul de l'il·luminació a nivell de fragment?<br/>
+            <br/>
+
+            <h4>Llum ambient</h4>
+            
+            <b>Color de la llum:</b> <input type="color" id="colorAmbient" value="#333333" onchange="setAmbientLight(this.value);">
+
+            <h4>Llum Direccional</h4>
+
+            <b>Color de la llum:</b> <input type="color" id="colorDireccional" value="#aaaaaa" onchange="setDirectionalLight(this.value);"></br>
+            <b>Posició de la llum:</b>
+                X: <input type="number" id="lightPositionX" value="0.0" />
+                Y: <input type="number" id="lightPositionY" value="5.0" />
+                Z: <input type="number" id="lightPositionZ" value="0.0" />
         </div>
     </div>
 </div>
-
-<input type="checkbox" id="lighting" checked /> Use lighting<br/>
-<input type="checkbox" id="per-fragment" checked /> Per-fragment lighting<br/>
-<br/>
-
-    <h2>Point light:</h2>
-
-    <table style="border: 0; padding: 10px;">
-        <tr>
-            <td><b>Location:</b>
-            <td>X: <input type="text" id="lightPositionX" value="0.0" />
-            <td>Y: <input type="text" id="lightPositionY" value="0.0" />
-            <td>Z: <input type="text" id="lightPositionZ" value="-5.0" />
-        </tr>
-        <tr>
-            <td><b>Colour:</b>
-            <td>R: <input type="text" id="pointR" value="0.8" />
-            <td>G: <input type="text" id="pointG" value="0.8" />
-            <td>B: <input type="text" id="pointB" value="0.8" />
-        </tr>
-    </table>
-
-    <h2>Ambient light:</h2>
-
-    <table style="border: 0; padding: 10px;">
-        <tr>
-            <td><b>Colour:</b>
-            <td>R: <input type="text" id="ambientR" value="0.2" />
-            <td>G: <input type="text" id="ambientG" value="0.2" />
-            <td>B: <input type="text" id="ambientB" value="0.2" />
-        </tr>
-    </table>
-
 </body>
 
 </html>
