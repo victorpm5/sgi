@@ -326,6 +326,70 @@
         perFragmentProgram = createProgram("per-fragment-lighting-fs", "per-fragment-lighting-vs");
     }
 
+
+    /**
+    ********************** Càlcul d'ombres **************************************
+    *****************************************************************************/
+
+    /** ---------------------------------------------------------------------
+     * Create a frame buffer for rendering into texture objects.
+     * @param gl WebGLRenderingContext
+     * @param width Number The width (in pixels) of the rendering (must be power of 2)
+     * @param height Number The height (in pixels) of the rendering (must be power of 2)
+     * @returns WebGLFramebuffer object
+     */
+   /* function _createFrameBufferObject(gl, width, height) {
+      var frame_buffer, color_buffer, depth_buffer, status;
+
+      // Step 1: Create a frame buffer object
+      frame_buffer = gl.createFramebuffer();
+
+      // Step 2: Create and initialize a texture buffer to hold the colors.
+      color_buffer = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, color_buffer);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0,
+                                      gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+      // Step 3: Create and initialize a texture buffer to hold the depth values.
+      // Note: the WEBGL_depth_texture extension is required for this to work
+      //       and for the gl.DEPTH_COMPONENT texture format to be supported.
+      depth_buffer = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, depth_buffer);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, width, height, 0,
+                                      gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+      // Step 4: Attach the specific buffers to the frame buffer.
+      gl.bindFramebuffer(gl.FRAMEBUFFER, frame_buffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, color_buffer, 0);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT,  gl.TEXTURE_2D, depth_buffer, 0);
+
+      // Step 5: Verify that the frame buffer is valid.
+      status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+      if (status !== gl.FRAMEBUFFER_COMPLETE) {
+        console.log("The created frame buffer is invalid: " + status.toString());
+      }
+
+      // Unbind these new objects, which makes the default frame buffer the
+      // target for rendering.
+      gl.bindTexture(gl.TEXTURE_2D, null);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+      return frame_buffer;
+    }
+
+    /*-----------------------------------------------------------------
+    -------------------------------------------------------------
+    -------------------------------------------*/
+
+
     function handleLoadedTexture(texture) {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.bindTexture(gl.TEXTURE_2D, texture);
