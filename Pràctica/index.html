@@ -813,9 +813,15 @@
         mvPushMatrix();
         
         mat4.translate(mvMatrix, [0, -2, 0]);
-        
+
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, fustaTexture);
+        
+        if(terraDragTex == 'fustaTex') gl.bindTexture(gl.TEXTURE_2D, fustaTexture);
+        else if(terraDragTex == 'moonTex') gl.bindTexture(gl.TEXTURE_2D, moonTexture);
+        else if(terraDragTex == 'earthTex') gl.bindTexture(gl.TEXTURE_2D, earthTexture);
+        else if(terraDragTex == 'rockTex') gl.bindTexture(gl.TEXTURE_2D, rockTexture);
+        else if(terraDragTex == 'lavaTex') gl.bindTexture(gl.TEXTURE_2D, lavaTexture);
+        else gl.bindTexture(gl.TEXTURE_2D, pedraTexture);
         gl.uniform1i(currentProgram.samplerUniform, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, terraVertexPositionBuffer);
@@ -1201,6 +1207,7 @@
         initTextures();
 
         tipusCamaraView = 'Perspectiva';
+        terraDragTex = 'fustaTex';
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -1212,6 +1219,27 @@
     
     function tipusCamara(e){
         tipusCamaraView = e;
+    }
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+    
+    function drag(ev) {
+        //alert(ev.target.src);
+        ev.dataTransfer.setData("src", ev.target.src);
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+    
+    var terraDragTex;
+
+    function drop(ev) {
+        ev.preventDefault();
+        var id = ev.dataTransfer.getData("text");
+        var src =  ev.dataTransfer.getData("src");
+        ev.target.src = src;
+
+        terraDragTex = id;
     }
 
 
@@ -1229,7 +1257,7 @@
 
         <div class="wrapper" style=" width: 650">
 
-            <canvas id="canvasID" width="650" height="550"></canvas>
+            <canvas id="canvasID" width="650" height="450"></canvas>
                 
             <div id="tipusCamara" class="btn-group" style="position: absolute; top:10; left:20;">
                 <button onclick="tipusCamara('Perspectiva')" type="button" class="btn btn-default">Perspectiva</button>
@@ -1281,8 +1309,6 @@
                             </select>
                     </div>
                 </div>
-
-
             </div>
 
         </div>
@@ -1290,10 +1316,49 @@
 
 </div>
 
+<div class="panel-group"style="border: 0; padding: 20px;">
+
+     <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h4>Texturas</h4>
+        </div>
+        <div class="panel-body">
+
+            <input type="checkbox" id="textures" checked /> Vols utilitzar textures? 
+            <br/>
+            <br/>
+
+            <p> Pots canviar la textura del Terra, selecciona una imatge i arrastra-la fins el quadrat següent:</p>
+
+            <b>Textura terra:</b> 
+            <div id="div1" style="width:100px;height:100px;border:1px solid #aaaaaa;display:inline-block;" ondrop="drop(event)" ondragover="allowDrop(event)"><img id="drag1" src="fusta.jpg" draggable="true" ondragstart="drag(event)" width="100" height="100"></div>
+
+            </br>
+            </br>
+
+            <img id="fustaTex" src="fusta.jpg" draggable="true" ondragstart="drag(event)" width="100" height="100">
+            <img id="moonTex" src="moon.gif" draggable="true" ondragstart="drag(event)" width="100" height="100">
+            <img id="piedraTex" src="piedra.jpg" draggable="true" ondragstart="drag(event)" width="100" height="100">
+            <img id="rockTex" src="rock.jpg" draggable="true" ondragstart="drag(event)" width="100" height="100">
+            <img id="earthTex" src="earth.jpg" draggable="true" ondragstart="drag(event)" width="100" height="100">
+            <img id="lavaTex" src="lava.png" draggable="true" ondragstart="drag(event)" width="100" height="100">
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h4>Il·luminació</h4>
+        </div>
+        <div class="panel-body">
+            <p> - Selecciona el tipus de càmara en la banda superior esquerra de l'escena</p>
+            <p> - Aplica zoom sobre l'escena mitjançant els botons del teclat '+' i '-' </p>
+            <p> - Mou la càmara de l'escena interactuant amb el ratolí </p>
+        </div>
+    </div>
+</div>
 
 <input type="checkbox" id="lighting" checked /> Use lighting<br/>
 <input type="checkbox" id="per-fragment" checked /> Per-fragment lighting<br/>
-<input type="checkbox" id="textures" checked /> Use textures<br/>
 <br/>
 
     <h2>Point light:</h2>
