@@ -64,9 +64,18 @@
 
     uniform bool uPintaFranjes;
 
+    uniform vec3 uColorPintaColor;
+
     void main(void) {
         vec4 fragmentColor;
-        if (uUseTextures) {
+        
+        if(uPintaFranjes){
+            if ( mod(gl_FragCoord.x,10.) > 5.){
+                discard;
+            }
+
+            fragmentColor = vec4(uColorPintaColor, 1.0);
+        } else if (uUseTextures) {
             fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
         } else {
             
@@ -130,6 +139,7 @@
     uniform bool uUseTextures;
     uniform bool uPintaFranjes;
 
+    uniform vec3 uColorPintaColor;
     uniform vec3 uAmbientColor;
 
     uniform vec3 uPointLightingLocation;
@@ -150,7 +160,14 @@
         }
 
         vec4 fragmentColor;
-        if (uUseTextures) {
+        
+         if(uPintaFranjes){
+            if ( mod(gl_FragCoord.x,10.) > 5.){
+                discard;
+            }
+
+            fragmentColor = vec4(uColorPintaColor, 1.0);
+        } else if (uUseTextures) {
             fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
         } else {
             fragmentColor = vec4(1.0, 1.0, 1.0, 1.0);
@@ -267,7 +284,9 @@
         program.pintaColorUniform = gl.getUniformLocation(program, "uPintaColor");
         program.pintaFranjesUniform = gl.getUniformLocation(program, "uPintaFranjes");
         
+        program.colorPintaColorUniform = gl.getUniformLocation(program, "uColorPintaColor");
         program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
+        program.tamanyFranjesUniform = gl.getUniformLocation(program, "uTamanyFranjes");
         
         program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
         program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
@@ -1108,6 +1127,15 @@
 
         var pintaFranja = document.getElementById("pintarFranjes").checked;
         gl.uniform1i(currentProgram.pintaFranjesUniform, pintaFranja)
+
+        gl.uniform3f(
+            currentProgram.colorPintaColorUniform,
+            parseFloat((sceneColor[0]/255.0)),
+            parseFloat((sceneColor[1]/255.0)),
+            parseFloat((sceneColor[2]/255.0))
+        );
+
+        
 
         viewTransform();
 
