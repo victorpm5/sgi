@@ -65,12 +65,13 @@
     uniform bool uPintaFranjes;
 
     uniform vec3 uColorPintaColor;
+    uniform float uTamanyFranjes;
 
     void main(void) {
         vec4 fragmentColor;
         
         if(uPintaFranjes){
-            if ( mod(gl_FragCoord.x,10.) > 5.){
+            if ( mod(gl_FragCoord.x,uTamanyFranjes) > (uTamanyFranjes/2.)){
                 discard;
             }
 
@@ -78,11 +79,6 @@
         } else if (uUseTextures) {
             fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
         } else {
-            
-            /*if ( mod(gl_FragCoord.x,10.) > 5.){
-                discard;
-            }*/
-
             fragmentColor = vec4(1.0, 1.0, 1.0, 1.0);
         }
         gl_FragColor = vec4(fragmentColor.rgb * vLightWeighting, fragmentColor.a);
@@ -142,6 +138,8 @@
     uniform vec3 uColorPintaColor;
     uniform vec3 uAmbientColor;
 
+    uniform float uTamanyFranjes;
+
     uniform vec3 uPointLightingLocation;
     uniform vec3 uPointLightingColor;
 
@@ -162,7 +160,7 @@
         vec4 fragmentColor;
         
          if(uPintaFranjes){
-            if ( mod(gl_FragCoord.x,10.) > 5.){
+            if (mod(gl_FragCoord.x,uTamanyFranjes) > (uTamanyFranjes/2.)){
                 discard;
             }
 
@@ -1135,7 +1133,7 @@
             parseFloat((sceneColor[2]/255.0))
         );
 
-        
+        gl.uniform1f(currentProgram.tamanyFranjesUniform,parseFloat(tamanyFranjes));
 
         viewTransform();
 
