@@ -2,10 +2,14 @@
 
 <head>
 <title>Practica</title>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<meta charset="UTF-8" />
+<meta http-equiv="content-type" content="text/html">
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <script id="per-vertex-lighting-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -148,7 +152,6 @@
         }
     }
 
-
     function getShader(gl, id) {
         var shaderScript = document.getElementById(id);
         if (!shaderScript) {
@@ -183,8 +186,6 @@
 
         return shader;
     }
-
-
 
     function createProgram(fragmentShaderID, vertexShaderID) {
         var fragmentShader = getShader(gl, fragmentShaderID);
@@ -221,7 +222,6 @@
         return program;
     }
 
-
     var currentProgram;
     var perVertexProgram;
     var perFragmentProgram;
@@ -230,7 +230,6 @@
         perVertexProgram = createProgram("per-vertex-lighting-fs", "per-vertex-lighting-vs");
         perFragmentProgram = createProgram("per-fragment-lighting-fs", "per-fragment-lighting-vs");
     }
-
 
     function handleLoadedTexture(texture) {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -242,8 +241,6 @@
 
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
-
-
     var moonTexture;
     var earthTexture;
     var fustaTexture;
@@ -256,7 +253,6 @@
         /*
         ********* Textura de Lluna ***********
         */
-
         moonTexture = gl.createTexture();
         moonTexture.image = new Image();
         moonTexture.image.onload = function () {
@@ -267,7 +263,6 @@
         /*
         ********* Textura de Terra ***********
         */
-
         earthTexture = gl.createTexture();
         earthTexture.image = new Image();
         earthTexture.image.onload = function () {
@@ -278,7 +273,6 @@
         /*
         ********* Textura de Fusta ***********
         */
-
         fustaTexture = gl.createTexture();
         fustaTexture.image = new Image();
         fustaTexture.image.onload = function () {
@@ -289,7 +283,6 @@
         /*
         ********* Textura de Lava ***********
         */
-
         lavaTexture = gl.createTexture();
         lavaTexture.image = new Image();
         lavaTexture.image.onload = function () {
@@ -300,7 +293,6 @@
         /*
         ********* Textura de Pedra ***********
         */
-
         pedraTexture = gl.createTexture();
         pedraTexture.image = new Image();
         pedraTexture.image.onload = function () {
@@ -311,7 +303,6 @@
                 /*
         ********* Textura de ROCK ***********
         */
-
         rockTexture = gl.createTexture();
         rockTexture.image = new Image();
         rockTexture.image.onload = function () {
@@ -359,9 +350,8 @@
     var teapotVertexNormalBuffer;
     var teapotVertexTextureCoordBuffer;
     var teapotVertexIndexBuffer;
-
-
- function handleLoadedTeapot(teapotData) {
+    
+    function handleLoadedTeapot(teapotData) {
         teapotVertexNormalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexNormalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotData.vertexNormals), gl.STATIC_DRAW);
@@ -422,6 +412,11 @@
     var esferaVertexIndexBuffer;
     
     function initBuffers() {
+
+        /**
+        *******************************************************************
+        *************** Carrega teapot ************************************
+        *******************************************************************/
 
         loadTeapot();
 
@@ -817,7 +812,7 @@
 
         mvPushMatrix();
         
-        mat4.translate(mvMatrix, [0, -4, 0]);
+        mat4.translate(mvMatrix, [0, -2, 0]);
         
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, fustaTexture);
@@ -845,10 +840,17 @@
     function dibuixaPiramide(inversa){
 
         mvPushMatrix();
-        
-        mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
-        mat4.translate(mvMatrix, [6*inversa, 0, 0]);
-        
+
+        if(!girPropi){
+            mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
+            mat4.translate(mvMatrix, [6*inversa, 0, 0]);
+        } else {
+            mat4.translate(mvMatrix, [6*inversa, 0, 0]);
+            mat4.translate(mvMatrix, [0 +(horizontalPiramide*inversa), 0+verticalPiramide, 0]);
+            mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
+            mat4.scale(mvMatrix,[escalaPiramide,escalaPiramide,escalaPiramide]);
+        }
+
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, pedraTexture);
         gl.uniform1i(currentProgram.samplerUniform, 0);
@@ -872,9 +874,9 @@
 
         mvPushMatrix();
         
-        mat4.translate(mvMatrix, [0+horizontal, 0+vertical, 0]);
-        mat4.scale(mvMatrix,[escala,escala,escala]);
+        mat4.translate(mvMatrix, [0+horizontalEsfera, 0+verticalEsfera, 0]);
         mat4.rotate(mvMatrix, degToRad(moonAngle), [0, 1, 0]);
+        mat4.scale(mvMatrix,[escalaEsfera,escalaEsfera,escalaEsfera]);
         
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, lavaTexture);
@@ -899,11 +901,16 @@
     function dibuixaCub(){
 
         mvPushMatrix();
-        
-        
-        mat4.scale(mvMatrix,[escala,escala,escala]);
-        mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
-        mat4.translate(mvMatrix, [3, 0, 0]);
+
+        if(!girPropi){
+            mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
+            mat4.translate(mvMatrix, [3, 0, 0]);
+        } else {
+            mat4.translate(mvMatrix, [3, 0, 0]);
+            mat4.translate(mvMatrix, [0+horizontalCub, 0+verticalCub, 0]);
+            mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
+            mat4.scale(mvMatrix,[escalaCub,escalaCub,escalaCub]);
+        }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
         gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -929,9 +936,17 @@
 
         mvPushMatrix();
         
-        mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
-        mat4.translate(mvMatrix, [-3, 0, 0]);
-        mat4.scale(mvMatrix,[-0.08 + (escala*0.2),-0.08 + (escala*0.2),-0.08 + (escala*0.2)]);
+
+        if(!girPropi){
+            mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
+            mat4.translate(mvMatrix, [-3, 0, 0]);
+            mat4.scale(mvMatrix,[-0.08 + (escalaTetera*0.2),-0.08 + (escalaTetera*0.2),-0.08 + (escalaTetera*0.2)]);
+        } else {
+            mat4.translate(mvMatrix, [-3, 0, 0]);
+            mat4.translate(mvMatrix, [0+horizontalTetera, 0+verticalTetera, 0]);
+            mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
+            mat4.scale(mvMatrix,[-0.08 + (escalaTetera*0.2),-0.08 + (escalaTetera*0.2),-0.08 + (escalaTetera*0.2)]);
+        }
         
 
         gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexPositionBuffer);
@@ -960,7 +975,12 @@
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
+        if(tipusCamaraView == 'Perspectiva'){
+            mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0,pMatrix);
+        } else {
+            mat4.ortho( -10.0, 10.0, -10.0, 10.0, 0.1, 100, pMatrix);
+            // ( left, right, bottom, top, near, far,out)
+        } 
     }
 
     function viewTransform(){
@@ -1030,6 +1050,24 @@
     }
 
 
+    var girPropi = false;
+
+    var verticalEsfera = 0;
+    var horizontalEsfera = 0;
+    var escalaEsfera = 1;
+
+    var verticalCub = 0;
+    var horizontalCub = 0;
+    var escalaCub = 1;
+
+    var verticalTetera = 0;
+    var horizontalTetera = 0;
+    var escalaTetera = 1;
+
+    var verticalPiramide = 0;
+    var horizontalPiramide = 0;
+    var escalaPiramide = 1;
+
     var vertical = 0;
     var horizontal = 0;
     var escala = 1;
@@ -1037,12 +1075,12 @@
     
     document.onkeypress = function(e){
         
-        if(e.key == 'w') vertical += 0.1;
-        else if (e.key == 's') vertical -= 0.1;
-        else if (e.key == 'a') horizontal -= 0.1;
-        else if (e.key == 'd') horizontal += 0.1;
-        else if (e.key == 'k') escala += 0.1;
-        else if (e.key == 'l') escala -= 0.1;
+        if(e.key == 'w') transformaVertical(0.1);
+        else if (e.key == 's') transformaVertical(-0.1);
+        else if (e.key == 'a') transformaHorizontal(-0.1);
+        else if (e.key == 'd') transformaHorizontal(+0.1);
+        else if (e.key == 'k') escalaFigura(0.1);
+        else if (e.key == 'l') escalaFigura(-0.1);
         else if (e.key == '+') zoom += 0.5;
         else if (e.key == '-') zoom -= 0.5;
         
@@ -1050,6 +1088,52 @@
         else if (zoom < -40) zoom = -40;
     };
 
+    function escalaFigura(valor){
+        var figura = $('#figuraTransforma').val();
+
+        if(figura == 'esfera') escalaEsfera += valor;
+        else if(figura == 'cub') escalaCub += valor;
+        else if(figura == 'tetera') escalaTetera += valor;
+        else if (figura == 'piramide') escalaPiramide += valor;
+
+        comprovaGirPropi();
+    }
+
+    function transformaHorizontal(valor){
+        var figura = $('#figuraTransforma').val();
+
+        if(figura == 'esfera') horizontalEsfera += valor;
+        else if(figura == 'cub') horizontalCub += valor;
+        else if(figura == 'tetera') horizontalTetera += valor;
+        else if (figura == 'piramide') horizontalPiramide += valor;
+
+        comprovaGirPropi();
+    }
+
+    function transformaVertical(valor){
+        var figura = $('#figuraTransforma').val();
+
+        if(figura == 'esfera') verticalEsfera += valor;
+        else if(figura == 'cub') verticalCub += valor;
+        else if(figura == 'tetera') verticalTetera += valor;
+        else if (figura == 'piramide') verticalPiramide += valor;
+
+        comprovaGirPropi();
+    }
+
+    function comprovaGirPropi(){
+
+        if(escalaEsfera == 1 && escalaCub == 1 && escalaTetera == 1 && escalaPiramide == 1 &&
+            horizontalEsfera == 0 && horizontalCub == 0 && horizontalTetera == 0 && horizontalPiramide == 0 &&
+            verticalEsfera == 0 && verticalCub == 0 && verticalTetera == 0 && verticalPiramide == 0){
+            
+            girPropi = false;
+        
+        } else{
+            girPropi = true;
+        }
+
+    }
 
     var xClick = 0;
     var yClick = 0;
@@ -1116,11 +1200,20 @@
         initBuffers();
         initTextures();
 
+        tipusCamaraView = 'Perspectiva';
+
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 
         tick();
     }
+
+    var tipusCamaraView;
+    
+    function tipusCamara(e){
+        tipusCamaraView = e;
+    }
+
 
 </script>
 
@@ -1129,13 +1222,79 @@
 
 
 <body onload="webGLStart();">
-    <canvas id="canvasID" style="border: none;" width="500" height="500"></canvas>
-    <br/>
 
-    <input type="checkbox" id="lighting" checked /> Use lighting<br/>
-    <input type="checkbox" id="per-fragment" checked /> Per-fragment lighting<br/>
-    <input type="checkbox" id="textures" checked /> Use textures<br/>
-    <br/>
+<div class="row">
+    
+    <div class="col-xs-6 text-center">
+
+        <div class="wrapper" style=" width: 650">
+
+            <canvas id="canvasID" width="650" height="550"></canvas>
+                
+            <div id="tipusCamara" class="btn-group" style="position: absolute; top:10; left:20;">
+                <button onclick="tipusCamara('Perspectiva')" type="button" class="btn btn-default">Perspectiva</button>
+                <button onclick="tipusCamara('Axonometrica')"type="button" class="btn btn-default">Axonomètrica</button>
+            </div>
+
+            <audio controls>
+                <source src="Lee_Rosevere_-_Star_Song.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+
+
+        </div>        
+    </div>
+    
+    <div class='col-xs-6'>
+        
+        <div style="border: 0; padding: 10px;">
+            
+            <div class="panel-group">
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h4>Vista</h4>
+                    </div>
+                    <div class="panel-body">
+                        <p> - Selecciona el tipus de càmara en la banda superior esquerra de l'escena</p>
+                        <p> - Aplica zoom sobre l'escena mitjançant els botons del teclat '+' i '-' </p>
+                        <p> - Mou la càmara de l'escena interactuant amb el ratolí </p>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h4>Transformacions geomètriques</h4>
+                    </div>
+                    <div class="panel-body">
+                        
+                        <p>L'escena inicial consta d'una esfera i 4 figures que giren al seu voltant. Si vols, pots aplicar transformacions geomètriques sobre l'escena. Escull una figura a continuació (<b>les piramides van juntes i actuen com un mirall</b>) i utilitza les lletres del teclat <b>A,W,S,D</b> per moure't en els eixos X i Y. També pots utilitzar les tecles <b>K i L</b> per aplicar escalats.</p>
+
+                        <p> Nota: Quan apliquis transformacions geomètriques, les figures deixaran de girar entorn de l'esfera per girar sobre si mateixes. </p>
+
+                        Quina figura vols modificar?
+                            <select id='figuraTransforma'>
+                                <option value="esfera">Esfera</option>
+                                <option value="cub">Cub</option>
+                                <option value="tetera">Tetera</option>
+                                <option value="piramide">Piramides</option>
+                            </select>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<input type="checkbox" id="lighting" checked /> Use lighting<br/>
+<input type="checkbox" id="per-fragment" checked /> Per-fragment lighting<br/>
+<input type="checkbox" id="textures" checked /> Use textures<br/>
+<br/>
 
     <h2>Point light:</h2>
 
