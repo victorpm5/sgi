@@ -57,12 +57,14 @@
 
     varying vec2 vTextureCoord;
     varying vec3 vLightWeighting;
+    varying vec3 vColorEscena;
 
     uniform bool uUseTextures;
 
     uniform sampler2D uSampler;
 
     uniform bool uPintaFranjes;
+    uniform bool uPintaColor;
 
     uniform vec3 uColorPintaColor;
     uniform float uTamanyFranjes;
@@ -76,6 +78,8 @@
             }
 
             fragmentColor = vec4(uColorPintaColor, 1.0);
+        }else if (uPintaColor){
+            fragmentColor = vec4(vColorEscena,1.0);
         } else if (uUseTextures) {
             fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
         } else {
@@ -103,8 +107,11 @@
 
     uniform bool uPintaColor;
 
+    uniform vec3 uColorEscena;
+
     varying vec2 vTextureCoord;
     varying vec3 vLightWeighting;
+    varying vec3 vColorEscena;
 
     void main(void) {
         vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -120,6 +127,11 @@
             float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
             vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;
         }
+
+        if(uPintaColor){
+            vColorEscena = vec3((uColorEscena.r/gl_Position.y),(uColorEscena.g/gl_Position.y),(uColorEscena.b/gl_Position.y));
+        }
+
     }
 </script>
 
@@ -130,6 +142,7 @@
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
     varying vec4 vPosition;
+    varying vec3 vColorEscena;
 
     uniform bool uUseLighting;
     uniform bool uUseTextures;
@@ -137,6 +150,7 @@
 
     uniform vec3 uColorPintaColor;
     uniform vec3 uAmbientColor;
+    uniform bool uPintaColor;
 
     uniform float uTamanyFranjes;
 
@@ -165,6 +179,8 @@
             }
 
             fragmentColor = vec4(uColorPintaColor, 1.0);
+        }else if (uPintaColor){
+            fragmentColor = vec4(vColorEscena,1.0);
         } else if (uUseTextures) {
             fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
         } else {
@@ -185,9 +201,12 @@
 
     uniform bool uPintaColor;
 
+    uniform vec3 uColorEscena;
+
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
     varying vec4 vPosition;
+    varying vec3 vColorEscena;
 
 
     void main(void) {
@@ -195,6 +214,11 @@
         gl_Position = uPMatrix * vPosition;
         vTextureCoord = aTextureCoord;
         vTransformedNormal = uNMatrix * aVertexNormal;
+
+        if(uPintaColor){
+            vColorEscena = vec3((uColorEscena.r/gl_Position.y),(uColorEscena.g/gl_Position.y),(uColorEscena.b/gl_Position.y));
+        }
+
     }
 </script>
 
@@ -283,6 +307,7 @@
         program.pintaFranjesUniform = gl.getUniformLocation(program, "uPintaFranjes");
         
         program.colorPintaColorUniform = gl.getUniformLocation(program, "uColorPintaColor");
+        program.colorEscenaUniform = gl.getUniformLocation(program, "uColorEscena");
         program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
         program.tamanyFranjesUniform = gl.getUniformLocation(program, "uTamanyFranjes");
         
@@ -1128,6 +1153,13 @@
 
         gl.uniform3f(
             currentProgram.colorPintaColorUniform,
+            parseFloat((sceneColor[0]/255.0)),
+            parseFloat((sceneColor[1]/255.0)),
+            parseFloat((sceneColor[2]/255.0))
+        );
+
+        gl.uniform3f(
+            currentProgram.colorEscenaUniform,
             parseFloat((sceneColor[0]/255.0)),
             parseFloat((sceneColor[1]/255.0)),
             parseFloat((sceneColor[2]/255.0))
